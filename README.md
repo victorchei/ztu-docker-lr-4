@@ -1,5 +1,84 @@
 # HelloDockerRealWorld
 
+## Створення docker-compose.yml (Production)
+
+Створіть файл `docker-compose.yml` у корені проекту з таким вмістом:
+
+```yaml
+version: '3' # Версія синтаксису Docker Compose
+services:
+  api: # Сервіс Node.js API
+    build: ./api # Збірка образу з Dockerfile у папці api
+    command: npm start # Команда запуску у production
+    ports:
+      - '3001:3001' # Проброс порту 3001 на хості у контейнер
+    environment:
+      - PORT=3001 # Змінна середовища для Node.js
+      - HOST=localhost
+      - MONGO_URL=mongodb://api_db:27017/api # URL для MongoDB
+    depends_on:
+      - api_db # Залежність: запускати після MongoDB
+  api_db:
+    image: mongo:latest # Офіційний образ MongoDB
+    volumes:
+      - mongodb_api:/data/db # Іменований том для збереження даних
+
+volumes:
+  mongodb_api: # Оголошення іменованого тому
+```
+
+## Створення docker-compose.dev.yml (Development)
+
+Створіть файл `docker-compose.dev.yml` у корені проекту з таким вмістом:
+
+```yaml
+version: '3' # Версія синтаксису Docker Compose
+services:
+  api:
+    build:
+      context: ./api # Шлях до Dockerfile
+      dockerfile: Dockerfile.dev # Використовуємо dev-образ
+    command: npm run dev # Запуск з hot-reload
+    ports:
+      - '3001:3001' # Проброс порту
+    environment:
+      - PORT=3001
+      - HOST=localhost
+      - MONGO_URL=mongodb://api_db:27017/api
+    volumes:
+      - ./api/src:/usr/src/app/src # Том для синхронізації коду
+    depends_on:
+      - api_db
+  api_db:
+    image: mongo:latest
+```
+
+### Пояснення основних директив
+
+- `version`: версія синтаксису Docker Compose.
+- `services`: перелік сервісів (контейнерів), які запускаються разом.
+- `build`: параметри для збірки Docker-образу.
+- `command`: команда, яка виконується при старті контейнера.
+- `ports`: проброс портів між хостом і контейнером.
+- `environment`: змінні середовища для контейнера.
+- `depends_on`: залежності між сервісами (який контейнер має стартувати першим).
+- `volumes`: томи для збереження даних або синхронізації коду.
+
+## Запуск проекту
+
+- Для production: створіть `docker-compose.yml` за інструкцією вище та запустіть:
+  ```sh
+  docker compose up --build
+  ```
+- Для development: створіть обидва файли та запустіть:
+  ```sh
+  docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+  ```
+
+---
+
+_Файли docker-compose не зберігаються у git. Створюйте їх локально згідно інструкції._
+
 ## Запуск у режимі продакшену (Production)
 
 1. Переконайтесь, що у вас встановлено Docker.
