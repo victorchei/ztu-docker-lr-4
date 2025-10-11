@@ -1,0 +1,20 @@
+version: '3'
+services:
+  api:
+    build: ./api
+    command: npm start
+    ports:
+      - '3001:3001'
+    environment:
+      - PORT=3001
+      - HOST=0.0.0.0
+      - MONGO_URL=mongodb://api_db:27017/api
+    depends_on:
+      - api_db
+  api_db:
+    image: mongo:latest
+    volumes:
+      - mongodb_api:/data/db
+
+volumes:
+  mongodb_api:
