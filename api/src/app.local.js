@@ -1,5 +1,14 @@
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
+// Load dotenv for flexible local dev envs (DOTENV_PATH overrides)
+try {
+  const dotenvPath = process.env.DOTENV_PATH || './.env.local';
+  require('dotenv').config({ path: dotenvPath });
+  if (process.env.DOTENV_PATH) console.log('Loaded env from', process.env.DOTENV_PATH);
+} catch (e) {
+  // ignore if dotenv not installed or file missing
+}
+
 const { mongoURL } = require('./configuration/index');
 
 async function start() {
