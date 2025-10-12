@@ -1,4 +1,5 @@
-FROM node:20-bullseye-slim AS build
+ARG NODE_IMAGE=node:22.14.0-bullseye-slim
+FROM ${NODE_IMAGE} AS build
 WORKDIR /app
 ARG VITE_API_BASE
 ENV VITE_API_BASE=${VITE_API_BASE}

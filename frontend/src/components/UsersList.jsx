@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-const API_BASE = import.meta.env.VITE_API_BASE || '';
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3001';
 
 export default function UsersList({ refreshKey }) {
   const [users, setUsers] = useState([]);
@@ -14,7 +14,14 @@ export default function UsersList({ refreshKey }) {
         setError(null);
         const res = await fetch(`${API_BASE}/users`);
         if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-        const data = await res.json();
+        const ct = res.headers.get('content-type') || '';
+        let data;
+        if (ct.includes('application/json')) {
+          data = await res.json();
+        } else {
+          const text = await res.text();
+          throw new Error(`Expected JSON response but got: ${text.slice(0, 200)}`);
+        }
         setUsers(data);
       } catch (e) {
         setError(e.message);
@@ -34,7 +41,7 @@ export default function UsersList({ refreshKey }) {
     <ul className='users-list'>
       {users.map((u) => (
         <li key={u._id || u.id}>
-          <strong>{u.name}</strong> — {u.email}
+          <strong>{(u.firstName || '') + (u.lastName ? ' ' + u.lastName : '') || u.name}</strong> — {u.email}
         </li>
       ))}
     </ul>
