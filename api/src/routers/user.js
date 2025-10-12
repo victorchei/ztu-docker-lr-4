@@ -8,8 +8,17 @@ router.post('/', async (req, res) => {
     await user.save();
     res.json(user);
   } catch (error) {
-    res.status(400);
-    res.send('User validation failed. Please check your data');
+    // If it's a Mongoose validation error, return the field errors
+    if (error.name === 'ValidationError') {
+      const details = Object.keys(error.errors).reduce((acc, key) => {
+        acc[key] = error.errors[key].message;
+        return acc;
+      }, {});
+      return res.status(400).json({ message: 'User validation failed', details });
+    }
+
+    // Fallback
+    res.status(400).json({ message: error.message || 'Bad Request' });
   }
 });
 
