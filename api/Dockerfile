@@ -1,4 +1,5 @@
-FROM node:20-alpine3.17
+ARG NODE_IMAGE=node:22.14.0-bullseye-slim
+FROM ${NODE_IMAGE}
 WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm install --omit=dev
