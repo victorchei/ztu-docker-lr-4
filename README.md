@@ -285,7 +285,7 @@ services:
     ports:
       - '3003:3000' # dev frontend доступний на хості 3003
     environment:
-      - VITE_API_BASE=${VITE_API_BASE:-http://host.docker.internal:3002}
+      - VITE_API_BASE=${VITE_API_BASE:-http://localhost:3002}
     volumes:
       - ./frontend:/usr/src/app
       - /usr/src/app/node_modules
