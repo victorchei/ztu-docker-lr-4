@@ -474,6 +474,7 @@ curl -i http://localhost:8080/api/users   # dev
 #### Що таке Azure Container Registry?
 
 ACR — це приватне сховище Docker образів у Azure. Переваги над Docker Hub:
+
 - ✅ **Приватність** — тільки ви маєте доступ
 - ✅ **Швидкість** — образи зберігаються в тому ж регіоні, що й ваші сервіси
 - ✅ **Безпека** — інтеграція з Azure AD та Role-Based Access Control
@@ -556,6 +557,7 @@ az acr repository list --name hellodockeracr --output table
 ```
 
 **Очікуваний результат:**
+
 ```
 Result
 ----------
@@ -581,6 +583,7 @@ az acr repository show \
 ### Варіант 1: Деплой через Azure Container Apps (рекомендовано)
 
 **Переваги:**
+
 - Автоматичне масштабування (0 → N інстансів)
 - Вбудований HTTPS
 - Просте управління через CLI
@@ -662,6 +665,7 @@ az containerapp show \
 ### Варіант 2: Деплой через Azure Container Instances (ACI)
 
 **Переваги:**
+
 - Найпростіший спосіб
 - Платите тільки за час роботи
 - Швидкий запуск
@@ -821,6 +825,7 @@ az containerapp env delete --name hellodocker-env --resource-group HelloDockerRG
 ### Production best practices
 
 1. **Використовуйте Azure Cosmos DB** замість контейнера MongoDB:
+
 ```bash
 az cosmosdb create \
   --name hellodocker-cosmos \
@@ -832,6 +837,7 @@ az cosmosdb create \
 2. **Налаштуйте CI/CD** через GitHub Actions або Azure DevOps
 
 3. **Додайте Application Insights** для моніторингу:
+
 ```bash
 az monitor app-insights component create \
   --app hellodocker-insights \
@@ -840,6 +846,7 @@ az monitor app-insights component create \
 ```
 
 4. **Використовуйте Azure Key Vault** для секретів:
+
 ```bash
 az keyvault create \
   --name hellodocker-vault \
@@ -849,15 +856,16 @@ az keyvault create \
 
 ### Вартість (приблизно)
 
-| Сервіс | Ціна | Примітка |
-|--------|------|----------|
-| ACR Basic | $5/місяць | 10 GB storage |
-| Container Apps | $15-30/місяць | Залежить від навантаження |
-| ACI | $10-20/місяць | Платите за CPU/RAM hour |
-| Cosmos DB | $24+/місяць | Production база даних |
-| Application Insights | $2-10/місяць | Моніторинг |
+| Сервіс               | Ціна          | Примітка                  |
+| -------------------- | ------------- | ------------------------- |
+| ACR Basic            | $5/місяць     | 10 GB storage             |
+| Container Apps       | $15-30/місяць | Залежить від навантаження |
+| ACI                  | $10-20/місяць | Платите за CPU/RAM hour   |
+| Cosmos DB            | $24+/місяць   | Production база даних     |
+| Application Insights | $2-10/місяць  | Моніторинг                |
 
 **Безкоштовні альтернативи для студентів:**
+
 - [Azure for Students](https://azure.microsoft.com/en-us/free/students/) — $100 кредитів
 - [GitHub Student Developer Pack](https://education.github.com/pack) — безкоштовний доступ до багатьох сервісів
 
@@ -893,12 +901,14 @@ az keyvault create \
 
 ✅ **$100 кредитів Azure** (на 12 місяців)  
 ✅ **Безкоштовні сервіси** без кредитної картки:
+
 - Azure App Service
 - Azure Container Instances (750 годин/місяць)
 - Azure Database for PostgreSQL/MySQL
 - Azure DevOps
 
 ✅ **Після закінчення кредитів:**
+
 - Можете перейти на Pay-As-You-Go
 - Або використовувати тільки безкоштовні сервіси
 
@@ -1013,7 +1023,7 @@ name: Stop Azure Containers (Night)
 
 on:
   schedule:
-    - cron: '0 22 * * *'  # 22:00 UTC щодня
+    - cron: '0 22 * * *' # 22:00 UTC щодня
 
 jobs:
   stop:
@@ -1023,7 +1033,7 @@ jobs:
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-      
+
       - name: Stop Containers
         run: |
           az container stop --resource-group HelloDockerStudentRG --name hellodocker-api
@@ -1033,11 +1043,13 @@ jobs:
 #### Корисні посилання для студентів
 
 📚 **Навчальні ресурси:**
+
 - [Microsoft Learn for Students](https://docs.microsoft.com/en-us/learn/student-hub/)
 - [Azure Fundamentals](https://docs.microsoft.com/en-us/learn/paths/azure-fundamentals/)
 - [GitHub Campus Experts](https://education.github.com/experts)
 
 🎁 **Інші безкоштовні сервіси з GitHub Student Pack:**
+
 - **Heroku**: $13/місяць кредитів
 - **DigitalOcean**: $200 кредитів
 - **Namecheap**: безкоштовний домен .me на 1 рік
@@ -1046,18 +1058,21 @@ jobs:
 
 💡 **Поради:**
 
-1. **Відстежуйте витрати**: 
+1. **Відстежуйте витрати**:
+
 ```bash
 # Перевірка залишку кредитів
 az account show --query "subscriptionPolicies"
 ```
 
 2. **Використовуйте тільки необхідні ресурси**:
+
    - Мінімальні CPU/Memory для dev
    - Вимикайте на ніч
    - Видаляйте невикористані ресурси
 
 3. **Налаштуйте бюджет**:
+
 ```bash
 az consumption budget create \
   --budget-name student-budget \
@@ -1070,28 +1085,31 @@ az consumption budget create \
 
 #### Порівняння варіантів для студентів
 
-| Варіант | Вартість | Складність | Рекомендовано для |
-|---------|----------|-----------|-------------------|
-| Docker Hub + ACI | $0 | Низька | Демо, навчання |
-| ACR + ACI + $100 кредитів | ~$0-20 | Середня | Курсові проекти |
-| Container Apps + Cosmos DB | ~$30-50 | Висока | Production проекти |
-| Heroku (з Student Pack) | $0-13 | Дуже низька | Швидкий старт |
+| Варіант                    | Вартість | Складність  | Рекомендовано для  |
+| -------------------------- | -------- | ----------- | ------------------ |
+| Docker Hub + ACI           | $0       | Низька      | Демо, навчання     |
+| ACR + ACI + $100 кредитів  | ~$0-20   | Середня     | Курсові проекти    |
+| Container Apps + Cosmos DB | ~$30-50  | Висока      | Production проекти |
+| Heroku (з Student Pack)    | $0-13    | Дуже низька | Швидкий старт      |
 
 ### Troubleshooting
 
 **Помилка: "registry access denied"**
+
 ```bash
 # Перезавантажте ACR credentials
 az acr login --name hellodockeracr
 ```
 
 **Помилка: "name already exists"**
+
 ```bash
 # Виберіть інше унікальне ім'я для ACR
 az acr create --name hellodocker$(date +%s) ...
 ```
 
 **Container не запускається**
+
 ```bash
 # Перевірте логи
 az containerapp logs show --name api --resource-group HelloDockerRG --tail 100
