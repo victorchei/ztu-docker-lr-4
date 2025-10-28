@@ -1,5 +1,21 @@
 version: '3'
 services:
+  nginx:
+    container_name: nginx_dev
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile.dev
+    ports:
+      - '8080:80'
+    depends_on:
+      - api
+      - frontend
+    networks:
+      - app-network-dev
+    volumes:
+      - ./nginx/nginx.dev.conf:/etc/nginx/nginx.conf:ro
+      - nginx_logs:/var/log/nginx
+
   api:
     container_name: api_dev
     build:
@@ -8,9 +24,8 @@ services:
       args:
         NODE_IMAGE: node:22.14.0-bullseye-slim
     command: npm run dev
-    ports:
-      # bind dev API to different host port to avoid colliding with prod
-      - '3002:3001'
+    expose:
+      - '3001'
     environment:
       - PORT=3001
       - HOST=0.0.0.0
@@ -19,6 +34,8 @@ services:
       - ./api/src:/usr/src/app/src
     depends_on:
       - api_db
+    networks:
+      - app-network-dev
 
   frontend:
     container_name: frontend_dev
@@ -28,11 +45,10 @@ services:
       args:
         NODE_IMAGE: node:22.14.0-bullseye-slim
     command: npm start
-    ports:
-      # bind dev frontend to a different host port for clarity
-      - '3003:3000'
+    expose:
+      - '3000'
     environment:
-      - VITE_API_BASE=${VITE_API_BASE:-http://localhost:3001}
+      - VITE_API_BASE=/api
       - WATCHPACK_POLLING=true
     volumes:
       - ./frontend:/usr/src/app
@@ -41,12 +57,21 @@ services:
     tty: true
     depends_on:
       - api
+    networks:
+      - app-network-dev
 
   api_db:
     container_name: api_db_dev
     image: mongo:latest
     volumes:
-      - mongodb_api:/data/db
+      - mongodb_api_dev:/data/db
+    networks:
+      - app-network-dev
 
 volumes:
-  mongodb_api:
+  mongodb_api_dev:
+  nginx_logs:
+
+networks:
+  app-network-dev:
+    driver: bridge
