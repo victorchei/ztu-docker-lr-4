@@ -19,7 +19,7 @@ services:
     build:
       context: ./api
       args:
-        NODE_IMAGE: node:22.14.0-alpine3.18
+        NODE_IMAGE: node:22.14.0-bullseye-slim
     command: npm start
     expose:
       - '3001'
