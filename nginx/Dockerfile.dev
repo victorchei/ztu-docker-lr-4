@@ -1,11 +1,21 @@
-FROM nginx:alpine
+# Вказує базовий образ nginx на Alpine Linux
+FROM nginx:alpine                  
 
-# Copy development configuration
+# Копіює файл конфігурації nginx для розробки у контейнер
 COPY nginx.dev.conf /etc/nginx/nginx.conf
 
-# Create log directory
+# Створює директорію для логів nginx
 RUN mkdir -p /var/log/nginx
 
+# Відкриває порт 80 для доступу до nginx ззовні
 EXPOSE 80
 
+# Запускає nginx у передньому плані (не у фоновому режимі)
+# 
+# CMD ["nginx", "-g", "daemon off;"] означає:
+# - Запускає процес nginx.
+# - Параметр "-g" дозволяє передати глобальну директиву конфігурації.
+# - "daemon off;" вимикає режим демона, тобто nginx не переходить у фоновий режим,
+#   а працює у передньому плані. Це потрібно для коректної роботи контейнера Docker,
+#   оскільки Docker завершує контейнер, якщо основний процес завершується.
 CMD ["nginx", "-g", "daemon off;"]

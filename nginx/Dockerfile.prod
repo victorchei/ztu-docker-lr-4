@@ -1,18 +1,35 @@
+# Вказує базовий образ nginx на Alpine Linux
 FROM nginx:alpine
 
-# Copy production configuration
+# Копіює файл конфігурації nginx для продакшну у контейнер
 COPY nginx.prod.conf /etc/nginx/nginx.conf
 
-# Create log directory
+# Створює директорію для логів nginx
 RUN mkdir -p /var/log/nginx
 
-# Remove default nginx configurations
+# Видаляє стандартні конфігурації nginx
 RUN rm -rf /etc/nginx/conf.d/*
 
+# Відкриває порт 80 для доступу до nginx ззовні
 EXPOSE 80
 
-# Health check
+# Перевірка здоров'я контейнера через HTTP-запит до /health
+# 
+# HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \ означає:
+# --interval=30s      # Періодичність перевірки (кожні 30 секунд)
+# --timeout=3s        # Максимальний час очікування відповіді (3 секунди)
+# --start-period=5s   # Час на старт контейнера перед першою перевіркою (5 секунд)
+# --retries=3         # Кількість спроб перед визнанням контейнера unhealthy (3 рази)
+# CMD wget ...        # Команда, яка виконує HTTP-запит до http://localhost/health
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD wget --quiet --tries=1 --spider http://localhost/health || exit 1
 
+# Запускає nginx у передньому плані (не у фоновому режимі)
+#
+# CMD ["nginx", "-g", "daemon off;"] означає:
+# - Запускає процес nginx.
+# - Параметр "-g" дозволяє передати глобальну директиву конфігурації.
+# - "daemon off;" вимикає режим демона, тобто nginx не переходить у фоновий режим,
+#   а працює у передньому плані. Це потрібно для коректної роботи контейнера Docker,
+#   оскільки Docker завершує контейнер, якщо основний процес завершується.
 CMD ["nginx", "-g", "daemon off;"]
